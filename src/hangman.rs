@@ -1,3 +1,9 @@
+use crate::dictionary;
+
+use dictionary::WordGenerator;
+
+const MAX_NUMBER_OF_GUESSES: u8 = 7;
+
 #[derive(Debug, PartialEq)]
 pub enum State {
     Win(u8),
@@ -11,17 +17,15 @@ pub struct HangmanGame {
     word: String,
     displayed_word: Vec<char>,
     incorrect_guesses: Vec<char>,
-    max_number_of_guesses: u8,
 }
 
 impl HangmanGame {
-    pub fn new(word: String, max_number_of_guesses: u8) -> HangmanGame {
-        let length = word.len();
+    pub fn new<T: WordGenerator>(t: T) -> HangmanGame {
+        let new_word = t.get_easy_word();
         HangmanGame {
-            word,
-            displayed_word: vec!['_'; length],
+            word: new_word.clone(),
+            displayed_word: vec!['_'; new_word.len()],
             incorrect_guesses: vec![],
-            max_number_of_guesses,
         }
     }
 
@@ -40,14 +44,18 @@ impl HangmanGame {
     }
 
     pub fn display_word(&self) -> String {
-        self.displayed_word.clone().into_iter().map(|c| {
-            let mut s = c.to_string();
-            s.push(' ');
-            s
-        }).fold(String::from(""), |mut acc, line| {
-            acc.push_str(line.as_str());
-            acc
-        })
+        self.displayed_word
+            .clone()
+            .into_iter()
+            .map(|c| {
+                let mut s = c.to_string();
+                s.push(' ');
+                s
+            })
+            .fold(String::from(""), |mut acc, line| {
+                acc.push_str(line.as_str());
+                acc
+            })
     }
 
     pub fn incorrect_guesses(&self) -> String {
@@ -58,7 +66,7 @@ impl HangmanGame {
         let guesses: u8 = self.incorrect_guesses.len() as u8;
         if !self.displayed_word.contains(&'_') {
             State::Win(guesses)
-        } else if guesses >= self.max_number_of_guesses {
+        } else if guesses >= MAX_NUMBER_OF_GUESSES {
             State::Lose
         } else {
             State::Active(guesses)
