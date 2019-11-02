@@ -1,9 +1,8 @@
-use crate::hangman::HangmanGame;
 use crate::dictionary;
+use crate::hangman::HangmanGame;
 use clap::{App, Arg};
 
-pub fn read_cli_args() -> HangmanGame{
-
+pub fn read_cli_args() -> HangmanGame {
     // Parse CLI command arguments
     let matches = App::new("Hangman")
         .version("1.0")
@@ -24,7 +23,6 @@ pub fn read_cli_args() -> HangmanGame{
     // Get the difficulty from the parse CLI arguments.
     let difficulty = matches.value_of("difficulty").unwrap_or("easy");
     println!("Value for difficulty: {}", difficulty);
-
 
     HangmanGame::new(dictionary::SimpleWordGenerator {})
 }
