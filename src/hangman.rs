@@ -6,7 +6,7 @@ const MAX_NUMBER_OF_GUESSES: u8 = 7;
 
 #[derive(Debug, PartialEq)]
 pub enum State {
-    Win(u8),
+    Win(u8), // Contains the number of incorrect guesses
     Lose,
     Active(u8), // Contains the number of incorrect guesses
 }
