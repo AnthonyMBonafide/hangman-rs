@@ -1,4 +1,5 @@
 use crate::dictionary;
+use crate::io::{Reader, Writer};
 
 use dictionary::WordGenerator;
 
@@ -6,26 +7,42 @@ const MAX_NUMBER_OF_GUESSES: u8 = 7;
 
 #[derive(Debug, PartialEq)]
 pub enum State {
-    Win(u8), // Contains the number of incorrect guesses
+    Win(u8),
+    // Contains the number of incorrect guesses
     Lose,
     Active(u8), // Contains the number of incorrect guesses
 }
 
 //TODO add fields which are generics for handling things like getting input, and displaying to
 // abstract those details. The main.rs file can determine which implementation to use.
-pub struct HangmanGame {
+pub struct HangmanGame<R, W>
+where
+    R: Reader,
+    W: Writer,
+{
     word: String,
     displayed_word: Vec<char>,
     incorrect_guesses: Vec<char>,
+    writer: W,
+    reader: R,
 }
 
-impl HangmanGame {
-    pub fn new<T: WordGenerator>(t: T) -> HangmanGame {
-        let new_word = t.get_easy_word();
+impl<R, W> HangmanGame<R, W>
+where
+    W: Writer,
+    R: Reader,
+{
+    pub fn new<G>(word_generator: G, reader: R, writer: W) -> HangmanGame<R, W>
+    where
+        G: WordGenerator,
+    {
+        let new_word = word_generator.get_easy_word();
         HangmanGame {
             word: new_word.clone(),
             displayed_word: vec!['_'; new_word.len()],
             incorrect_guesses: vec![],
+            reader,
+            writer,
         }
     }
 
@@ -70,6 +87,24 @@ impl HangmanGame {
             State::Lose
         } else {
             State::Active(guesses)
+        }
+    }
+
+    pub fn start(&mut self) {
+        // Main game loop
+        while match self.get_state() {
+            State::Active(_) => true,
+            _ => false,
+        } {
+            self.writer.write_game_state(&self);
+            let guess_result = self.reader.read_guess();
+            match guess_result {
+                Ok(guess) => self.guess(&guess),
+                Err(message) => {
+                    println!("Error: {}", message);
+                    break;
+                }
+            }
         }
     }
 }

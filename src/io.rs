@@ -7,7 +7,10 @@ pub trait Reader {
 }
 
 pub trait Writer {
-    fn write_game_state(&self, game: &HangmanGame);
+    fn write_game_state<R, W>(&self, game: &HangmanGame<R, W>)
+    where
+        R: Reader,
+        W: Writer;
 }
 
 pub struct CommandLineIO {}
@@ -25,7 +28,11 @@ impl Reader for CommandLineIO {
 }
 
 impl Writer for CommandLineIO {
-    fn write_game_state(&self, game: &HangmanGame) {
+    fn write_game_state<R, W>(&self, game: &HangmanGame<R, W>)
+    where
+        R: Reader,
+        W: Writer,
+    {
         display::draw(game.get_state());
         println!("Secret Word: {}", game.display_word());
         println!("Incorrect guesses: {}", game.incorrect_guesses());
