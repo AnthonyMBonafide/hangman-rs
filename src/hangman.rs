@@ -96,7 +96,11 @@ where
             State::Active(_) => true,
             _ => false,
         } {
-            self.writer.write_game_state(&self);
+            self.writer.write_game_state(
+                self.get_state(),
+                self.display_word(),
+                self.incorrect_guesses(),
+            );
             let guess_result = self.reader.read_guess();
             match guess_result {
                 Ok(guess) => self.guess(&guess),

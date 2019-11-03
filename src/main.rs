@@ -3,13 +3,14 @@ use hangman::State;
 
 mod cli;
 mod dictionary;
-mod display;
 mod hangman;
 mod io;
 
 fn main() {
+    let reader = io::create_reader();
+    let writer = io::create_writer();
     // Create a game with the word to guess based on the difficulty.
-    let mut game = read_cli_args();
+    let mut game = read_cli_args(reader, writer);
 
     // Run one hangman game.
     game.start();
