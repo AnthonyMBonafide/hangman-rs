@@ -1,3 +1,4 @@
+use crate::configuration::{Configuration, Difficulty};
 use crate::dictionary;
 use crate::io::{Reader, Writer};
 
@@ -13,13 +14,12 @@ pub enum State {
     Active(u8), // Contains the number of incorrect guesses
 }
 
-//TODO add fields which are generics for handling things like getting input, and displaying to
-// abstract those details. The main.rs file can determine which implementation to use.
 pub struct HangmanGame<R, W>
 where
     R: Reader,
     W: Writer,
 {
+    configuration: Configuration,
     word: String,
     displayed_word: Vec<char>,
     incorrect_guesses: Vec<char>,
@@ -32,17 +32,28 @@ where
     W: Writer,
     R: Reader,
 {
-    pub fn new<G>(word_generator: G, reader: R, writer: W) -> HangmanGame<R, W>
+    pub fn new<G>(
+        word_generator: G,
+        reader: R,
+        writer: W,
+        configuration: Configuration,
+    ) -> HangmanGame<R, W>
     where
         G: WordGenerator,
     {
-        let new_word = word_generator.get_easy_word();
+        let new_word: String = match configuration.get_difficulty() {
+            Difficulty::Easy => word_generator.get_easy_word(),
+            Difficulty::Normal => word_generator.get_medium_word(),
+            Difficulty::Hard => word_generator.get_hard_word(),
+        };
+
         HangmanGame {
             word: new_word.clone(),
             displayed_word: vec!['_'; new_word.len()],
             incorrect_guesses: vec![],
             reader,
             writer,
+            configuration,
         }
     }
 

@@ -1,25 +1,28 @@
-use std::io::{self, BufRead};
+use crate::configuration::{Configuration, InputOutput};
 use crate::hangman::State;
-use crate::hangman::State::{Active, Win, Lose};
+use crate::hangman::State::{Active, Lose, Win};
+use std::io::{self, BufRead};
 
-// TODO Create trait for prompting the user, which will be useful when asking if they want to play
-//  another game from the main game loop.
 pub trait Reader {
     fn read_guess(&self) -> Result<char, String>;
 }
 
-// TODO update these factory methods to accept game configurations and base the concrete
-//  implementation off of the config.
 pub trait Writer {
     fn write_game_state(&self, game_state: State, display_word: String, incorrect_guesses: String);
 }
 
-pub fn create_reader() -> impl Reader {
-    CommandLineIO {}
+pub fn create_reader(configuration: &Configuration) -> impl Reader {
+    match configuration.get_input() {
+        InputOutput::StdIn => CommandLineIO {},
+        _ => unimplemented!(),
+    }
 }
 
-pub fn create_writer() -> impl Writer {
-    CommandLineIO {}
+pub fn create_writer(configuration: &Configuration) -> impl Writer {
+    match configuration.get_input() {
+        InputOutput::StdIn => CommandLineIO {},
+        _ => unimplemented!(),
+    }
 }
 
 pub struct CommandLineIO {}
@@ -36,8 +39,8 @@ impl Reader for CommandLineIO {
     }
 }
 
-
 impl CommandLineIO {
+    // TODO Cleanup this redundant code.
     fn draw(game_state: State) {
         match game_state {
             Win(x) => match x {
@@ -50,7 +53,7 @@ impl CommandLineIO {
                 6 => println!("{}", LEFT_LEG),
                 _ => println!("{}", GAME_OVER),
             },
-            Lose => { println!("{}", GAME_OVER) }
+            Lose => println!("{}", GAME_OVER),
             Active(n) => match n {
                 0 => println!("{}", BASE),
                 1 => println!("{}", HEAD),
@@ -73,7 +76,6 @@ impl Writer for CommandLineIO {
         println!("_______________________________");
     }
 }
-
 
 const GAME_OVER: &str = "
      _______________

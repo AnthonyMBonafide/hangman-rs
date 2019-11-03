@@ -1,9 +1,14 @@
+use crate::configuration::Configuration;
 use crate::dictionary;
 use crate::hangman::HangmanGame;
-use crate::io::{ Reader, Writer};
+use crate::io::{Reader, Writer};
 use clap::{App, Arg};
 
-pub fn read_cli_args<R, W>(reader : R, writer : W) -> HangmanGame<R,W> where R: Reader, W: Writer {
+pub fn read_cli_args<R, W>(reader: R, writer: W, configuration: Configuration) -> HangmanGame<R, W>
+where
+    R: Reader,
+    W: Writer,
+{
     // Parse CLI command arguments
     let matches = App::new("Hangman")
         .version("1.0")
@@ -25,5 +30,11 @@ pub fn read_cli_args<R, W>(reader : R, writer : W) -> HangmanGame<R,W> where R: 
     let difficulty = matches.value_of("difficulty").unwrap_or("easy");
     println!("Value for difficulty: {}", difficulty);
 
-    HangmanGame::new(dictionary::SimpleWordGenerator {}, reader, writer)
+    // TODO create Configuration based on the CLI arguments.
+    HangmanGame::new(
+        dictionary::SimpleWordGenerator {},
+        reader,
+        writer,
+        configuration,
+    )
 }
