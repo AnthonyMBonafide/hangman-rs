@@ -1,15 +1,11 @@
 use crate::configuration::{Configuration, InputOutput};
 use crate::hangman::State;
 use crate::hangman::State::{Active, Lose, Win};
+use crate::io::input;
+use crate::io::output;
+use input::reader::Reader;
+use output::writer::Writer;
 use std::io::{self, BufRead};
-
-pub trait Reader {
-    fn read_guess(&self) -> Result<char, String>;
-}
-
-pub trait Writer {
-    fn write_game_state(&self, game_state: State, display_word: String, incorrect_guesses: String);
-}
 
 pub fn create_reader(configuration: &Configuration) -> impl Reader {
     match configuration.get_input() {

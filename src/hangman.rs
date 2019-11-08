@@ -1,7 +1,9 @@
 use crate::configuration::{Configuration, Difficulty};
 use crate::dictionary;
-use crate::io::{Reader, Writer};
+use crate::io::input::reader::Reader;
+use crate::io::output::writer::Writer;
 
+use crate::io::input;
 use dictionary::WordGenerator;
 
 const MAX_NUMBER_OF_GUESSES: u8 = 7;

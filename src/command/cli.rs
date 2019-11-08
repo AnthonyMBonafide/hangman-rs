@@ -1,7 +1,9 @@
 use crate::configuration::Configuration;
 use crate::dictionary;
 use crate::hangman::HangmanGame;
-use crate::io::{Reader, Writer};
+use crate::io::input::reader::Reader;
+use crate::io::output::writer::Writer;
+
 use clap::{App, Arg};
 
 pub fn read_cli_args<R, W>(reader: R, writer: W, configuration: Configuration) -> HangmanGame<R, W>

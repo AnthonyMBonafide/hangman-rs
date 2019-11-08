@@ -1,8 +1,10 @@
-use crate::cli::read_cli_args;
-use crate::configuration::{Configuration, Database, Difficulty, InputOutput};
+use command::cli;
+use configuration::{Configuration, Database, Difficulty, InputOutput};
 use hangman::State;
+use io::input;
+use io::output;
 
-mod cli;
+mod command;
 mod configuration;
 mod dictionary;
 mod hangman;
@@ -16,15 +18,16 @@ fn main() {
         InputOutput::StdIn,
         Database::File,
     );
-    let reader = io::create_reader(&configuration);
-    let writer = io::create_writer(&configuration);
+
+    let reader = io::cli::create_reader(&configuration);
+    let writer = io::cli::create_writer(&configuration);
     // Create a game with the word to guess based on the difficulty.
-    let mut game = read_cli_args(reader, writer, configuration);
+    let mut game = cli::read_cli_args(reader, writer, configuration);
 
     // Run one hangman game.
     game.start();
 
-    // TODO Move this functionality to either the HangmanGame struct or the writer so that this is
+    // TODO Move this functionality to either the HangmanGame struct or the output so that this is
     //  done at the end of the game automatically.
     // Display the results of the game.
     match game.get_state() {
